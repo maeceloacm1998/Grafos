@@ -10,12 +10,11 @@ public class GrafoUtils {
 
     /*
     * Essa função serve para transformar a linha que você mandar, que seria do formato
-    * "(Vertice)/(CAMINHO)/(CAMINHO)/(CAMINHO)/...
+    * "(Vertice)/(CAMINHO)_(peso)/(CAMINHO)_(peso)/(CAMINHO)_(peso)/...
     * em um objeto contendo vertice e uma lista de conexões que ele vai fazer
-    * EXEMPLO DE LINHA DO GRAFO = "A/A-B/A-C"
+    * EXEMPLO DE LINHA DO GRAFO = "A/A-B_b/A-C_c"
     * PARA GRAFO SEM LIGAÇÕES, COLOCA APENAS UMA BARRA "Exemplo: "A/"
     * */
-    @org.jetbrains.annotations.Nullable
     public static GrafoItemModel getGrafo(String grafoLine) {
         if (!grafoLine.isEmpty()) {
             String[] split = grafoLine.split("/");
@@ -26,6 +25,14 @@ public class GrafoUtils {
         } else {
             return null;
         }
+    }
+
+    public static String getConnection(String edge) {
+        return edge.split("-")[1].split("_")[0];
+    }
+
+    public static String getWeight(String edge) {
+        return edge.split("-")[1].split("_")[1];
     }
 
     private static String getVertex(String[] split) {
