@@ -1,4 +1,5 @@
 
+import libs.AdjacentList;
 import libs.AdjacentMatriz;
 import models.GrafoItemModel;
 import utils.GrafoUtils;
@@ -15,10 +16,15 @@ public class App {
         grafoList.add(GrafoUtils.getGrafo("C/C-D_3/C-B_5"));
         grafoList.add(GrafoUtils.getGrafo("D/D-E_3"));
         grafoList.add(GrafoUtils.getGrafo("E/"));
-
+        
         AdjacentMatriz grafo =  new AdjacentMatriz(grafoList);
+        AdjacentList lista = new AdjacentList(grafoList);
+        
+
 
         Boolean x = grafo.isVertexLabeled("A");
+        Boolean y = lista.isVertexLabeled("A");
+        System.out.println(y);
         String a = "";
     }
 

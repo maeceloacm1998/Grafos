@@ -27,6 +27,15 @@ public class GrafoUtils {
         }
     }
 
+    public static boolean isWeightNumeric(String weight) {
+        try {
+            Integer.parseInt(weight);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public static String getConnection(String edge) {
         return edge.split("-")[1].split("_")[0];
     }
