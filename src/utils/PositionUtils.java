@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PositionUtils {
-    static Map<String,Integer> vertices;
+    private static Map<String,Integer> vertices;
+    public static final Integer NOT_EXIST_POSITION = -1;
 
     public PositionUtils(List<GrafoItemModel> list) {
         vertices = new HashMap<>();
@@ -17,6 +18,13 @@ public class PositionUtils {
     }
 
     public static int getPosition(String vertex) {
-        return vertices.get(vertex);
+        try {
+            return vertices.get(vertex);
+        } catch (Exception error) {
+            System.out.println(error + " - A posicao "+vertex+" nao existe");
+        }
+        return NOT_EXIST_POSITION;
     }
+
+
 }
