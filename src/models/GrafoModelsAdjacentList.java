@@ -1,7 +1,7 @@
 package models;
 
 
-public interface GrafoModels {
+public interface GrafoModelsAdjacentList {
     public void insert(String vertex, String edge);
     public void remove(String vertex, String edge) ;
     public Boolean isVertexThoughtful(String vertex);

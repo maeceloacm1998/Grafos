@@ -10,7 +10,7 @@ import java.util.List;
 
 public class App {
     public static void init() {
-        List<GrafoItemModel> grafoList = new ArrayList(Collections.emptyList());
+        List<GrafoItemModel> grafoList = new ArrayList<GrafoItemModel>(Collections.emptyList());
         grafoList.add(GrafoUtils.getGrafo("A/A-B_a/A-C_a"));
         grafoList.add(GrafoUtils.getGrafo("B/B-E_4/B-D_3"));
         grafoList.add(GrafoUtils.getGrafo("C/C-D_3/C-B_5"));

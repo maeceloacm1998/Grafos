@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import models.GrafoItemModel;
-import models.GrafoModels;
+import models.GrafoModelsAdjacentList;
 import utils.GrafoUtils;
 
 class Edge {
@@ -27,9 +27,7 @@ class Edge {
     }
 }
 
-public class AdjacentList implements GrafoModels {
-    private final String EXIST_EDGE = "1";
-    private final String NOT_EXIST_EDGE = "0";
+public class AdjacentList implements GrafoModelsAdjacentList {
 
     Map<String, List<Edge>> adjacentList;
 
@@ -58,8 +56,10 @@ public class AdjacentList implements GrafoModels {
     @Override
     public void insert(String vertex, String edge) {
         String connection = GrafoUtils.getConnection(edge);
+        String weight = GrafoUtils.getWeight(edge);
+
         List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
-        edges.add(new Edge(connection, "1"));
+        edges.add(new Edge(connection, weight));
         this.adjacentList.put(vertex, edges);
     }
 
