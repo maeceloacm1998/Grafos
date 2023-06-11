@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 public class App {
     public static void init() {
         List<GrafoItemModel> grafoList = new ArrayList<GrafoItemModel>(Collections.emptyList());
