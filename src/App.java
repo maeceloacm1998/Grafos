@@ -22,11 +22,13 @@ public class App {
         AdjacentMatriz grafo =  new AdjacentMatriz(grafoList);
         AdjacentList lista = new AdjacentList(grafoList);
         
-
-
+        
+        Boolean adjacentEdge = lista.isAdjacentEdge("A-B", "A-C");
+        // boolean adjacentVertex = lista.isAdjacentVertex("A", "C");
+        System.out.println(adjacentEdge);
         Boolean x = grafo.isVertexLabeled("A");
         Boolean y = lista.isVertexLabeled("A");
-        System.out.println(y);
+        // System.out.println(y);
         String a = "";
     }
 

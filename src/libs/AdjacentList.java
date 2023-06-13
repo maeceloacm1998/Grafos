@@ -94,4 +94,20 @@ public class AdjacentList implements GrafoModelsAdjacentList {
         String weight = GrafoUtils.getWeight(edge);
         return !GrafoUtils.isWeightNumeric(weight);
     }
+
+    @Override
+    public Boolean isAdjacentVertex(String vertex, String adjacentVertex) {
+        List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
+        return edges.stream().anyMatch(e -> e.getConnection().equals(adjacentVertex));
+    }
+
+    @Override
+    public Boolean isAdjacentEdge(String vertex, String adjacentEdge) {
+        List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
+    return edges.stream().anyMatch(e -> {
+        String connection = GrafoUtils.getConnection(adjacentEdge);
+        String weight = GrafoUtils.getWeight(adjacentEdge);
+        return e.getConnection().equals(connection) && e.getWeight().equals(weight);
+    });
+    }
 }

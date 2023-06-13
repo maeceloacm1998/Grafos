@@ -8,9 +8,8 @@ public interface GrafoModelsAdjacentList {
     public Boolean isVertexLabeled(String vertex);
     public Boolean isEdgeThoughtful(String edge);
     public Boolean isEdgeLabeled(String edge);
-
-//    public Boolean isAdjacentVertex();
-//    public Boolean isAdjacentEdge();
+    public Boolean isAdjacentVertex(String vertex, String adjacentVertex);
+    public Boolean isAdjacentEdge(String vertex, String adjacentEdge);
 //    public Boolean isVertexIncidency();
 //    public Boolean isEdgeIncidency();
 //    public Boolean existEdge();
