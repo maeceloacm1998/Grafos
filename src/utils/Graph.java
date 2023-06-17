@@ -15,9 +15,9 @@ public class Graph {
     * EXEMPLO DE LINHA DO GRAFO = "A/A-B_b/A-C_c"
     * PARA GRAFO SEM LIGAÇÕES, COLOCA APENAS UMA BARRA "Exemplo: "A/"
     * */
-    public static GraphItem getGrafo(String grafoLine) {
-        if (!grafoLine.isEmpty()) {
-            String[] split = grafoLine.split("/");
+    public static GraphItem getGraph(String graphLine) {
+        if (!graphLine.isEmpty()) {
+            String[] split = graphLine.split("/");
             String vertex = getVertex(split);
             List<String> edgeList = getEdgeList(split);
 

@@ -13,81 +13,81 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
     private final String EXIST_EDGE = "1";
     private final String NOT_EXIST_EDGE = "0";
 
-    String[][] adjascentMatriz;
-    String[][] weightMatriz;
+    String[][] adjacencyMatrix;
+    String[][] weightMatrix;
 
     public AdjacencyMatrix(List<GraphItem> list) {
-        adjascentMatriz = new String[list.size()][list.size()];
-        weightMatriz = new String[list.size()][list.size()];
+        adjacencyMatrix = new String[list.size()][list.size()];
+        weightMatrix = new String[list.size()][list.size()];
         new Position(list);
         init(list);
     }
 
     private void init(List<GraphItem> list) {
-        emptyMatriz(list);
-        handleMatrizWithWeight(list);
-        executeGrafo(list);
+        emptyMatrix(list);
+        handleMatrixWithWeight(list);
+        executeGraph(list);
     }
 
-    private void handleMatrizWithWeight(List<GraphItem> list) {
-        list.forEach(grafoItemModel -> {
-            grafoItemModel.getEdges().forEach(edge -> {
+    private void handleMatrixWithWeight(List<GraphItem> list) {
+        list.forEach(graphItemModel -> {
+            graphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
                 String weight = Graph.getWeight(edge);
-                weightMatriz[Position.getPosition(grafoItemModel.getVertex())][Position.getPosition(connection)] = weight;
+                weightMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = weight;
             });
         });
     }
 
-    private void executeGrafo(List<GraphItem> list) {
-        list.forEach(grafoItemModel -> {
-            grafoItemModel.getEdges().forEach(edge -> {
+    private void executeGraph(List<GraphItem> list) {
+        list.forEach(graphItemModel -> {
+            graphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
-                adjascentMatriz[Position.getPosition(grafoItemModel.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+                adjacencyMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
             });
         });
     }
 
-    private void emptyMatriz(List<GraphItem> list) {
+    private void emptyMatrix(List<GraphItem> list) {
         for (int i = 0; i < list.size(); i++) {
             for (int y = 0; y < list.size(); y++) {
-                adjascentMatriz[i][y] = "0";
-                weightMatriz[i][y] = "0";
+                adjacencyMatrix[i][y] = "0";
+                weightMatrix[i][y] = "0";
             }
         }
     }
 
     @Override
-    public void insert(GraphItem grafoItem) {
-        if (existGrafoItem(grafoItem.getVertex()) && connectionIsValid(grafoItem)) {
-            insertNewConnection(grafoItem);
-            insertNewWeight(grafoItem);
+    public void insert(GraphItem graphItem) {
+        if (existGraphItem(graphItem.getVertex()) && connectionIsValid(graphItem)) {
+            insertNewConnection(graphItem);
+            insertNewWeight(graphItem);
         }
     }
 
-    private void insertNewConnection(GraphItem grafoItem) {
-        grafoItem.getEdges().forEach(edge -> {
+    private void insertNewConnection(GraphItem graphItem) {
+        graphItem.getEdges().forEach(edge -> {
             String connection = Graph.getConnection(edge);
-            adjascentMatriz[Position.getPosition(grafoItem.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+            adjacencyMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
         });
     }
 
-    private void insertNewWeight(GraphItem grafoItem) {
-        grafoItem.getEdges().forEach(edge -> {
+    private void insertNewWeight(GraphItem graphItem) {
+        graphItem.getEdges().forEach(edge -> {
             String connection = Graph.getConnection(edge);
             String weight = Graph.getWeight(edge);
-            weightMatriz[Position.getPosition(grafoItem.getVertex())][Position.getPosition(connection)] = weight;
+            weightMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = weight;
         });
     }
 
-    private Boolean existGrafoItem(String vertex) {
+    private Boolean existGraphItem(String vertex) {
         int position = Position.getPosition(vertex);
         return position != Position.NOT_EXIST_POSITION;
     }
 
-    private Boolean connectionIsValid(GraphItem grafoItem) {
+    private Boolean connectionIsValid(GraphItem graphItem) {
         AtomicReference<Boolean> isValid = new AtomicReference<>(true);
-        grafoItem.getEdges().forEach(edge -> {
+        graphItem.getEdges().forEach(edge -> {
             String connection = Graph.getConnection(edge);
             if (Position.getPosition(connection) == Position.NOT_EXIST_POSITION) {
                 isValid.set(false);
@@ -99,15 +99,15 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
     @Override
     public void remove(String vertex, String edge) {
         String connection = Graph.getConnection(edge);
-        adjascentMatriz[Position.getPosition(vertex)][Position.getPosition(connection)] = NOT_EXIST_EDGE;
+        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] = NOT_EXIST_EDGE;
     }
 
     @Override
     public Boolean isVertexThoughtful(String vertex) {
         boolean isThoughtful = false;
-        for (int i = 0; i < weightMatriz.length; i++) {
+        for (int i = 0; i < weightMatrix.length; i++) {
             try {
-                int weight = Integer.parseInt(weightMatriz[Position.getPosition(vertex)][i]);
+                int weight = Integer.parseInt(weightMatrix[Position.getPosition(vertex)][i]);
                 if (weight != 0) {
                     isThoughtful = true;
                 }
@@ -122,9 +122,9 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
     @Override
     public Boolean isVertexLabeled(String vertex) {
         boolean isLabeled = false;
-        for (int i = 0; i < weightMatriz.length; i++) {
+        for (int i = 0; i < weightMatrix.length; i++) {
             try {
-                Integer.parseInt(weightMatriz[Position.getPosition(vertex)][i]);
+                Integer.parseInt(weightMatrix[Position.getPosition(vertex)][i]);
             } catch (Exception error) {
                 isLabeled = true;
             }
@@ -167,8 +167,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         int positionVertexOne = Position.getPosition(vertexOne);
         int positionVertexTwo = Position.getPosition(vertexTwo);
 
-        return adjascentMatriz[positionVertexOne][positionVertexTwo].equals(EXIST_EDGE)
-                || adjascentMatriz[positionVertexTwo][positionVertexOne].equals(EXIST_EDGE);
+        return adjacencyMatrix[positionVertexOne][positionVertexTwo].equals(EXIST_EDGE)
+                || adjacencyMatrix[positionVertexTwo][positionVertexOne].equals(EXIST_EDGE);
     }
 
     @Override
@@ -177,8 +177,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         String[] splitConnectionTwo = connectionTwo.split("-");
 
         if (validateAdjacentEdges(splitConnectionOne, splitConnectionTwo)) {
-            return adjascentMatriz[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
-                    && adjascentMatriz[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
+            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
+                    && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
         }
         return false;
     }

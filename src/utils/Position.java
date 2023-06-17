@@ -12,8 +12,8 @@ public class Position {
 
     public Position(List<GraphItem> list) {
         vertices = new HashMap<>();
-        list.forEach(grafoItemModel -> {
-            vertices.put(grafoItemModel.getVertex(), list.indexOf(grafoItemModel));
+        list.forEach(graphItem -> {
+            vertices.put(graphItem.getVertex(), list.indexOf(graphItem));
         });
     }
 
@@ -21,7 +21,7 @@ public class Position {
         try {
             return vertices.get(vertex);
         } catch (Exception error) {
-            System.out.println(error + " - A posicao "+vertex+" nao existe");
+            System.out.println(error + " - A posição "+vertex+" não existe.");
         }
         return NOT_EXIST_POSITION;
     }

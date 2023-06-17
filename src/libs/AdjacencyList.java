@@ -41,10 +41,10 @@ public class AdjacencyList implements IAdjacencyList {
     }
 
     private void handleAdjacencyList(List<GraphItem> list) {
-        list.forEach(GrafoItemModel -> {
-            String vertex = GrafoItemModel.getVertex();
+        list.forEach(GraphItemModel -> {
+            String vertex = GraphItemModel.getVertex();
             List<Edge> edges = new ArrayList<>();
-            GrafoItemModel.getEdges().forEach(edge -> {
+            GraphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
                 String weight = Graph.getWeight(edge);
                 edges.add(new Edge(connection, weight));
