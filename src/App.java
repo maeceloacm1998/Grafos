@@ -1,26 +1,24 @@
 
-import libs.AdjacentList;
-import libs.AdjacentMatriz;
-import models.GrafoItemModel;
-import utils.GrafoUtils;
+import libs.AdjacencyList;
+import libs.AdjacencyMatrix;
+import models.GraphItem;
+import utils.Graph;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
-
 public class App {
     public static void init() {
-        List<GrafoItemModel> grafoList = new ArrayList<GrafoItemModel>(Collections.emptyList());
-        grafoList.add(GrafoUtils.getGrafo("A/A-B_a/A-C_a"));
-        grafoList.add(GrafoUtils.getGrafo("B/B-E_4/B-D_3"));
-        grafoList.add(GrafoUtils.getGrafo("C/C-D_3/C-B_5"));
-        grafoList.add(GrafoUtils.getGrafo("D/D-E_3"));
-        grafoList.add(GrafoUtils.getGrafo("E/"));
+        List<GraphItem> grafoList = new ArrayList<GraphItem>(Collections.emptyList());
+        grafoList.add(Graph.getGrafo("A/A-B_a/A-C_a"));
+        grafoList.add(Graph.getGrafo("B/B-E_4/B-D_3"));
+        grafoList.add(Graph.getGrafo("C/C-D_3/C-B_5"));
+        grafoList.add(Graph.getGrafo("D/D-E_3"));
+        grafoList.add(Graph.getGrafo("E/"));
         
-        AdjacentMatriz grafo =  new AdjacentMatriz(grafoList);
-        AdjacentList lista = new AdjacentList(grafoList);
+        AdjacencyMatrix grafo =  new AdjacencyMatrix(grafoList);
+        AdjacencyList lista = new AdjacencyList(grafoList);
         
         
         Boolean adjacentEdge = lista.isAdjacentEdge("A-B", "A-C");

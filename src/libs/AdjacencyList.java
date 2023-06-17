@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import models.GrafoItemModel;
-import models.GrafoModelsAdjacentList;
-import utils.GrafoUtils;
+import models.GraphItem;
+import models.IAdjacencyList;
+import utils.Graph;
 
 class Edge {
     private String connection;
@@ -27,26 +27,26 @@ class Edge {
     }
 }
 
-public class AdjacentList implements GrafoModelsAdjacentList {
+public class AdjacencyList implements IAdjacencyList {
 
     Map<String, List<Edge>> adjacentList;
 
-    public AdjacentList(List<GrafoItemModel> list) {
+    public AdjacencyList(List<GraphItem> list) {
         this.adjacentList = new HashMap<>();
         init(list);
     }
 
-    private void init(List<GrafoItemModel> list) {
+    private void init(List<GraphItem> list) {
         handleAdjacencyList(list);
     }
 
-    private void handleAdjacencyList(List<GrafoItemModel> list) {
+    private void handleAdjacencyList(List<GraphItem> list) {
         list.forEach(GrafoItemModel -> {
             String vertex = GrafoItemModel.getVertex();
             List<Edge> edges = new ArrayList<>();
             GrafoItemModel.getEdges().forEach(edge -> {
-                String connection = GrafoUtils.getConnection(edge);
-                String weight = GrafoUtils.getWeight(edge);
+                String connection = Graph.getConnection(edge);
+                String weight = Graph.getWeight(edge);
                 edges.add(new Edge(connection, weight));
             });
             this.adjacentList.put(vertex, edges);
@@ -55,8 +55,8 @@ public class AdjacentList implements GrafoModelsAdjacentList {
 
     @Override
     public void insert(String vertex, String edge) {
-        String connection = GrafoUtils.getConnection(edge);
-        String weight = GrafoUtils.getWeight(edge);
+        String connection = Graph.getConnection(edge);
+        String weight = Graph.getWeight(edge);
 
         List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
         edges.add(new Edge(connection, weight));
@@ -65,7 +65,7 @@ public class AdjacentList implements GrafoModelsAdjacentList {
 
     @Override
     public void remove(String vertex, String edge) {
-        String connection = GrafoUtils.getConnection(edge);
+        String connection = Graph.getConnection(edge);
         List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
         edges.removeIf(e -> e.getConnection().equals(connection));
         this.adjacentList.put(vertex, edges);
@@ -80,19 +80,19 @@ public class AdjacentList implements GrafoModelsAdjacentList {
     @Override
     public Boolean isVertexLabeled(String vertex) {
         List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
-        return edges.stream().anyMatch(e -> !GrafoUtils.isWeightNumeric(e.getWeight()));
+        return edges.stream().anyMatch(e -> !Graph.isWeightNumeric(e.getWeight()));
     }
 
     @Override
     public Boolean isEdgeThoughtful(String edge) {
-        String weight = GrafoUtils.getWeight(edge);
-        return !weight.equals("0") && GrafoUtils.isWeightNumeric(weight);
+        String weight = Graph.getWeight(edge);
+        return !weight.equals("0") && Graph.isWeightNumeric(weight);
     }
 
     @Override
     public Boolean isEdgeLabeled(String edge) {
-        String weight = GrafoUtils.getWeight(edge);
-        return !GrafoUtils.isWeightNumeric(weight);
+        String weight = Graph.getWeight(edge);
+        return !Graph.isWeightNumeric(weight);
     }
 
     @Override
@@ -105,8 +105,8 @@ public class AdjacentList implements GrafoModelsAdjacentList {
     public Boolean isAdjacentEdge(String vertex, String adjacentEdge) {
         List<Edge> edges = this.adjacentList.getOrDefault(vertex, new ArrayList<>());
         return edges.stream().anyMatch(e -> {
-            String connection = GrafoUtils.getConnection(adjacentEdge);
-            String weight = GrafoUtils.getWeight(adjacentEdge);
+            String connection = Graph.getConnection(adjacentEdge);
+            String weight = Graph.getWeight(adjacentEdge);
             return e.getConnection().equals(connection) && e.getWeight().equals(weight);
         });
     }

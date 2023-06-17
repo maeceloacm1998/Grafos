@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import models.GrafoItemModel;
+import models.GraphItem;
 
-public class GrafoUtils {
+public class Graph {
 
     /*
     * Essa função serve para transformar a linha que você mandar, que seria do formato
@@ -15,13 +15,13 @@ public class GrafoUtils {
     * EXEMPLO DE LINHA DO GRAFO = "A/A-B_b/A-C_c"
     * PARA GRAFO SEM LIGAÇÕES, COLOCA APENAS UMA BARRA "Exemplo: "A/"
     * */
-    public static GrafoItemModel getGrafo(String grafoLine) {
+    public static GraphItem getGrafo(String grafoLine) {
         if (!grafoLine.isEmpty()) {
             String[] split = grafoLine.split("/");
             String vertex = getVertex(split);
             List<String> edgeList = getEdgeList(split);
 
-            return new GrafoItemModel(vertex, edgeList);
+            return new GraphItem(vertex, edgeList);
         } else {
             return null;
         }
@@ -49,7 +49,7 @@ public class GrafoUtils {
     }
 
     private static List<String> getEdgeList(String[] split) {
-        List<String> edges = new ArrayList(Collections.emptyList());
+        List<String> edges = new ArrayList<String>(Collections.emptyList());
 
         if(haveConnections(split)) {
             for (int i = 0; i < split.length; i++) {
