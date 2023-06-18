@@ -1,31 +1,17 @@
 package libs;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Scanner;
 import models.GraphItem;
 import models.IAdjacencyList;
+import models.Edge;
 import utils.Graph;
-
-class Edge {
-    private String connection;
-    private String weight;
-
-    public Edge(String connection, String weight) {
-        this.connection = connection;
-        this.weight = weight;
-    }
-
-    public String getConnection() {
-        return connection;
-    }
-
-    public String getWeight() {
-        return weight;
-    }
-}
 
 public class AdjacencyList implements IAdjacencyList {
 
@@ -51,6 +37,10 @@ public class AdjacencyList implements IAdjacencyList {
             });
             this.adjacentList.put(vertex, edges);
         });
+    }
+
+    public Map<String, List<Edge>> getAdjacentList() {
+        return adjacentList;
     }
 
     @Override
@@ -110,4 +100,95 @@ public class AdjacencyList implements IAdjacencyList {
             return e.getConnection().equals(connection) && e.getWeight().equals(weight);
         });
     }
+
+    @Override
+    public Boolean existEdge() {
+        return this.adjacentList.values().stream().anyMatch(e -> !e.isEmpty());
+    }
+
+
+    @Override
+    public Integer quantityEdge() {
+        return this.adjacentList.values().stream().mapToInt(List::size).sum();
+    }
+
+
+    @Override
+    public Integer quantityVertex() {
+        return this.adjacentList.size();
+    }
+
+    @Override
+    public Boolean isEmpty() {
+        return this.adjacentList.isEmpty();
+    }
+
+    @Override
+    public Boolean isComplet() {
+        List<String> vertices = new ArrayList<>(this.adjacentList.keySet());
+        for (int i = 0; i < vertices.size(); i++) {
+            for (int j = i + 1; j < vertices.size(); j++) {
+                if (!isAdjacentVertex(vertices.get(i), vertices.get(j))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, List<Edge>> entry : this.adjacentList.entrySet()) {
+            String vertex = entry.getKey();
+            List<Edge> edges = entry.getValue();
+            builder.append(vertex).append(": ");
+            for (Edge edge : edges) {
+                String connection = edge.getConnection();
+                String weight = edge.getWeight();
+                builder.append("(").append(connection).append(", ").append(weight).append(") ");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public void exportToCSV(String filePath) {
+        try (PrintWriter writer = new PrintWriter(new File(filePath))) {
+            for (Map.Entry<String, List<Edge>> entry : adjacentList.entrySet()) {
+                String vertex = entry.getKey();
+                List<Edge> edges = entry.getValue();
+                StringBuilder line = new StringBuilder(vertex);
+                for (Edge edge : edges) {
+                    line.append(";").append(edge.getConnection());
+                }
+                writer.println(line.toString());
+            }
+            System.out.println("Lista adjascente exportada com sucesso.");
+        } catch (FileNotFoundException e) {
+            System.err.println("Erro ao exportar lista adjascente para CSV: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void importFromCSV(String filePath) {
+        try (Scanner scanner = new Scanner(new File(filePath))) {
+            adjacentList.clear();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] tokens = line.split(";");
+                String vertex = tokens[0];
+                List<Edge> edges = new ArrayList<>();
+                for (int i = 1; i < tokens.length; i++) {
+                    edges.add(new Edge(tokens[i], "0"));
+                }
+                adjacentList.put(vertex, edges);
+            }
+            System.out.println("Lista adjascente importada com sucesso.");
+        } catch (FileNotFoundException e) {
+            System.err.println("Erro ao exportar lista adjascente para CSV: " + e.getMessage());
+        }
+    }
+
 }

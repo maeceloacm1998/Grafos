@@ -31,6 +31,10 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-        init();
+        // init();
+
+        AdjacencyList lista = new AdjacencyList(new ArrayList<GraphItem>(Collections.emptyList()));
+        lista.importFromCSV("uepa.csv");
+        lista.exportToCSV("teste3.csv");
     }
 }
