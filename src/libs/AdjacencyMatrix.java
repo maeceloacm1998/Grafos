@@ -4,7 +4,6 @@ import models.GraphItem;
 import models.IAdjacencyMatrix;
 import utils.Graph;
 import utils.Position;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,7 +33,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
             graphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
                 String weight = Graph.getWeight(edge);
-                weightMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = weight;
+                weightMatrix[Position.getPosition(graphItemModel.getVertex())][Position
+                        .getPosition(connection)] = weight;
             });
         });
     }
@@ -43,7 +43,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         list.forEach(graphItemModel -> {
             graphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
-                adjacencyMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+                adjacencyMatrix[Position.getPosition(graphItemModel.getVertex())][Position
+                        .getPosition(connection)] = EXIST_EDGE;
             });
         });
     }
@@ -68,7 +69,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
     private void insertNewConnection(GraphItem graphItem) {
         graphItem.getEdges().forEach(edge -> {
             String connection = Graph.getConnection(edge);
-            adjacencyMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+            adjacencyMatrix[Position.getPosition(graphItem.getVertex())][Position
+                    .getPosition(connection)] = EXIST_EDGE;
         });
     }
 
@@ -76,7 +78,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         graphItem.getEdges().forEach(edge -> {
             String connection = Graph.getConnection(edge);
             String weight = Graph.getWeight(edge);
-            weightMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = weight;
+            weightMatrix[Position.getPosition(graphItem.getVertex())][Position
+                    .getPosition(connection)] = weight;
         });
     }
 
@@ -99,7 +102,8 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
     @Override
     public void remove(String vertex, String edge) {
         String connection = Graph.getConnection(edge);
-        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] = NOT_EXIST_EDGE;
+        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] =
+                NOT_EXIST_EDGE;
     }
 
     @Override
@@ -177,19 +181,73 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         String[] splitConnectionTwo = connectionTwo.split("-");
 
         if (validateAdjacentEdges(splitConnectionOne, splitConnectionTwo)) {
-            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
-                    && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
+            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position
+                    .getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
+                    && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position
+                            .getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
         }
         return false;
     }
 
-    private Boolean validateAdjacentEdges(String[] splitConnectionOne, String[] splitConnectionTwo) {
-        Boolean firstValidation = isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[0]) || isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[1]);
-        Boolean secondValidate = isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[0]) || isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[1]);
+    private Boolean validateAdjacentEdges(String[] splitConnectionOne,
+            String[] splitConnectionTwo) {
+        Boolean firstValidation = isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[0])
+                || isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[1]);
+        Boolean secondValidate = isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[0])
+                || isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[1]);
         return secondValidate || firstValidation;
     }
 
     private Boolean isEqualsVertex(String vertexOne, String vertexTwo) {
         return vertexOne.equals(vertexTwo);
+    }
+
+    @Override
+    public Boolean existEdge() {
+        boolean existEdge = false;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (adjacencyMatrix[i][y].equals(EXIST_EDGE)) {
+                    existEdge = true;
+                }
+            }
+        }
+        return existEdge;
+    }
+
+    @Override
+    public Integer quantityEdge() {
+        int quantityEdge = 0;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (adjacencyMatrix[i][y].equals(EXIST_EDGE)) {
+                    quantityEdge++;
+                }
+            }
+        }
+        return quantityEdge;
+    }
+
+    @Override
+    public Integer quantityVertex() {
+        return adjacencyMatrix.length;
+    }
+
+    @Override
+    public Boolean isEmpty() {
+        return adjacencyMatrix.length == 0;
+    }
+
+    @Override
+    public Boolean isComplet() {
+        boolean isComplet = true;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (i != y && adjacencyMatrix[i][y].equals(NOT_EXIST_EDGE)) {
+                    isComplet = false;
+                }
+            }
+        }
+        return isComplet;
     }
 }
