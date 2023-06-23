@@ -3,227 +3,364 @@ package libs;
 import models.GraphItem;
 import models.IAdjacencyMatrix;
 import utils.Graph;
+import utils.Position;
 import java.util.List;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class AdjacencyMatrix implements IAdjacencyMatrix {
-    private final String WITHOUT_WEIGHT = "0";
+    private final String EXIST_EDGE = "1";
+    private final String NOT_EXIST_EDGE = "0";
 
-    private Map<String, Map<String, String>> adjacencyMatrix;
+    String[][] adjacencyMatrix;
+    String[][] weightMatrix;
 
+    /**
+     * Construtor da classe de matriz de adjascencia
+     *
+     * @param list Lista de itens do grafo (vértices e arestas)
+     */
     public AdjacencyMatrix(List<GraphItem> list) {
-        this.adjacencyMatrix = new HashMap<>();
+        adjacencyMatrix = new String[list.size()][list.size()];
+        weightMatrix = new String[list.size()][list.size()];
+        new Position(list);
         init(list);
     }
 
+    /**
+     * Inicializa a matriz de adjascencia
+     *
+     * @param list Lista de itens do grafo (vértices e arestas)
+     */
     private void init(List<GraphItem> list) {
-        handleAdjacencyMatrix(list);
+        emptyMatrix(list);
+        handleMatrixWithWeight(list);
+        executeGraph(list);
     }
 
-    private void handleAdjacencyMatrix(List<GraphItem> list) {
-        for (GraphItem item : list) {
-            String vertex = item.getVertex();
-            Map<String, String> edges = new HashMap<>();
-            for (String edge : item.getEdges()) {
+    /**
+     * Cria a list de matrix com os pesos de cada conecção
+     *
+     * @param list Lista de itens do grafo (vértices e arestas)
+     */
+    private void handleMatrixWithWeight(List<GraphItem> list) {
+        list.forEach(graphItemModel -> {
+            graphItemModel.getEdges().forEach(edge -> {
                 String connection = Graph.getConnection(edge);
                 String weight = Graph.getWeight(edge);
-                edges.put(connection, weight);
+                weightMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = weight;
+            });
+        });
+    }
+
+    /**
+     * Cria a list de matrix adjascente
+     *
+     * @param list Lista de itens do grafo (vértices e arestas)
+     */
+    private void executeGraph(List<GraphItem> list) {
+        list.forEach(graphItemModel -> {
+            graphItemModel.getEdges().forEach(edge -> {
+                String connection = Graph.getConnection(edge);
+                adjacencyMatrix[Position.getPosition(graphItemModel.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+            });
+        });
+    }
+
+    /**
+     * Usado para criar uma matriz em que todas posições saão 0
+     *
+     * @param list Lista de itens do grafo (vértices e arestas)
+     */
+    private void emptyMatrix(List<GraphItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int y = 0; y < list.size(); y++) {
+                adjacencyMatrix[i][y] = "0";
+                weightMatrix[i][y] = "0";
             }
-            adjacencyMatrix.put(vertex, edges);
         }
     }
 
-    public Map<String, Map<String, String>> getAdjacencyMatrix() {
-        return adjacencyMatrix;
-    }
-
+    /**
+     * Insere um vértice na matriz de adjasncencia
+     *
+     * @param graphItem Lista de itens do grafo (vértices e arestas)
+     */
     @Override
     public void insert(GraphItem graphItem) {
-        String vertex = graphItem.getVertex();
-        Map<String, String> edges = new HashMap<>();
-        for (String edge : graphItem.getEdges()) {
-            String connection = Graph.getConnection(edge);
-            String weight = Graph.getWeight(edge);
-            edges.put(connection, weight);
+        if (existGraphItem(graphItem.getVertex()) && connectionIsValid(graphItem)) {
+            insertNewConnection(graphItem);
+            insertNewWeight(graphItem);
         }
-        adjacencyMatrix.put(vertex, edges);
     }
 
+    /**
+     * inserir uma nova aresta existente com 1
+     *
+     * @param graphItem Lista de itens do grafo (vértices e arestas)
+     */
+    private void insertNewConnection(GraphItem graphItem) {
+        graphItem.getEdges().forEach(edge -> {
+            String connection = Graph.getConnection(edge);
+            adjacencyMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = EXIST_EDGE;
+        });
+    }
+
+    /**
+     * inserir um novo peso na matriz de pesos
+     *
+     * @param graphItem Lista de itens do grafo (vértices e arestas)
+     */
+    private void insertNewWeight(GraphItem graphItem) {
+        graphItem.getEdges().forEach(edge -> {
+            String connection = Graph.getConnection(edge);
+            String weight = Graph.getWeight(edge);
+            weightMatrix[Position.getPosition(graphItem.getVertex())][Position.getPosition(connection)] = weight;
+        });
+    }
+
+    /**
+     * Confere se existe aquele vertice.
+     *
+     * @param vertex vertice
+     */
+    private Boolean existGraphItem(String vertex) {
+        int position = Position.getPosition(vertex);
+        return position != Position.NOT_EXIST_POSITION;
+    }
+
+    /**
+     * Valida se aquela connecção é valida, se esta preenchida com 1
+     *
+     * @param graphItem Lista de itens do grafo (vértices e arestas)
+     */
+    private Boolean connectionIsValid(GraphItem graphItem) {
+        AtomicReference<Boolean> isValid = new AtomicReference<>(true);
+        graphItem.getEdges().forEach(edge -> {
+            String connection = Graph.getConnection(edge);
+            if (Position.getPosition(connection) == Position.NOT_EXIST_POSITION) {
+                isValid.set(false);
+            }
+        });
+        return isValid.get();
+    }
+
+    /**
+     * Usado para remover um vertice na matrix, colocando em vez de 1 para 0
+     *
+     * @param vertex vértices
+     * @param edge arestas
+     */
     @Override
     public void remove(String vertex, String edge) {
         String connection = Graph.getConnection(edge);
-        Map<String, String> edges = adjacencyMatrix.getOrDefault(vertex, new HashMap<>());
-        edges.remove(connection);
-        adjacencyMatrix.put(vertex, edges);
+        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] =
+                NOT_EXIST_EDGE;
     }
 
+    /**
+     * Verifica se o vertice é ponderado
+     *
+     * @param vertex Vértice a ser verificado
+     */
     @Override
     public Boolean isVertexThoughtful(String vertex) {
-        Map<String, String> edges = adjacencyMatrix.getOrDefault(vertex, new HashMap<>());
-        return edges.values().stream().anyMatch(weight -> !weight.equals(WITHOUT_WEIGHT));
+        boolean isThoughtful = false;
+        for (int i = 0; i < weightMatrix.length; i++) {
+            try {
+                int weight = Integer.parseInt(weightMatrix[Position.getPosition(vertex)][i]);
+                if (weight != 0) {
+                    isThoughtful = true;
+                }
+            } catch (Exception error) {
+                System.out.println("Erro ao verificar se o vertice é poderado." + error);
+            }
+        }
+
+        return isThoughtful;
     }
 
+    /**
+     * Verifica se o vertice é rotulado
+     *
+     * @param vertex Vértice a ser verificado
+     */
     @Override
     public Boolean isVertexLabeled(String vertex) {
-        Map<String, String> edges = adjacencyMatrix.getOrDefault(vertex, new HashMap<>());
-        return edges.values().stream().anyMatch(weight -> !Graph.isWeightNumeric(weight));
+        boolean isLabeled = false;
+        for (int i = 0; i < weightMatrix.length; i++) {
+            try {
+                Integer.parseInt(weightMatrix[Position.getPosition(vertex)][i]);
+            } catch (Exception error) {
+                isLabeled = true;
+            }
+        }
+
+        return isLabeled;
     }
 
+    /**
+     * Verifica se a aresta é ponderada
+     *
+     * @param edge Aresta a ser verificada
+     */
     @Override
     public Boolean isEdgeThoughtful(String edge) {
-        String weight = Graph.getWeight(edge);
-        return !weight.equals(WITHOUT_WEIGHT) && Graph.isWeightNumeric(weight);
+        boolean isThoughtful = false;
+
+        try {
+            int weight = Integer.parseInt(Graph.getWeight(edge));
+            if (weight != 0) {
+                isThoughtful = true;
+            }
+        } catch (Exception error) {
+            System.out.println("Erro ao verificar se a aresta é poderada." + error);
+        }
+
+        return isThoughtful;
     }
 
+    /**
+     * Verifica se a aresta é rotulada
+     *
+     * @param edge Aresta a ser verificada
+     */
     @Override
     public Boolean isEdgeLabeled(String edge) {
-        String weight = Graph.getWeight(edge);
-        return !Graph.isWeightNumeric(weight);
+        boolean isLabeled = false;
+
+        try {
+            Integer.parseInt(Graph.getWeight(edge));
+        } catch (Exception error) {
+            isLabeled = true;
+        }
+
+        return isLabeled;
     }
 
+    /**
+     * Verifica se o vértice é adjascente ao outro vértice
+     *
+     * @param vertexOne vertice um para comparação
+     * @param vertexTwo  vertice dois para comparação
+     */
     @Override
-    public Boolean isAdjacentVertex(String vertex, String adjacentVertex) {
-        Map<String, String> edges = adjacencyMatrix.getOrDefault(vertex, new HashMap<>());
-        return edges.containsKey(adjacentVertex);
+    public Boolean isAdjacentVertex(String vertexOne, String vertexTwo) {
+        int positionVertexOne = Position.getPosition(vertexOne);
+        int positionVertexTwo = Position.getPosition(vertexTwo);
+
+        return adjacencyMatrix[positionVertexOne][positionVertexTwo].equals(EXIST_EDGE)
+                || adjacencyMatrix[positionVertexTwo][positionVertexOne].equals(EXIST_EDGE);
     }
 
+    /**
+     * Verifica se o vértice é adjascente ao outro vértice
+     *
+     * @param connectionOne aresta um para comparação
+     * @param connectionTwo  aresta dois para comparação
+     */
     @Override
-    public Boolean isAdjacentEdge(String vertex, String adjacentEdge) {
-        Map<String, String> edges = adjacencyMatrix.getOrDefault(vertex, new HashMap<>());
-        String connection = Graph.getConnection(adjacentEdge);
-        String weight = Graph.getWeight(adjacentEdge);
-        String edgeWeight = edges.get(connection);
-        return edgeWeight != null && edgeWeight.equals(weight);
+    public Boolean isAdjacentEdge(String connectionOne, String connectionTwo) {
+        String[] splitConnectionOne = connectionOne.split("-");
+        String[] splitConnectionTwo = connectionTwo.split("-");
+
+        if (validateAdjacentEdges(splitConnectionOne, splitConnectionTwo)) {
+            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
+                    && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
+        }
+        return false;
     }
 
+    /**
+     * Valida se é possiível calcular se saão arestas adjascentes
+     * pois, caso as arestas comparadas sejasm com os mesmos vertices,
+     * não tem o que comparar.
+     *
+     * @param splitConnectionOne aresta um para comparação
+     * @param splitConnectionTwo  aresta dois para comparação
+     */
+    private Boolean validateAdjacentEdges(String[] splitConnectionOne, String[] splitConnectionTwo) {
+        Boolean firstValidation = isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[0]) || isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[1]);
+        Boolean secondValidate = isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[0]) || isEqualsVertex(splitConnectionOne[1], splitConnectionTwo[1]);
+        return secondValidate || firstValidation;
+    }
+
+    private Boolean isEqualsVertex(String vertexOne, String vertexTwo) {
+        return vertexOne.equals(vertexTwo);
+    }
+
+    /**
+     * Verifica se existe arestas na lista adjascente
+     *
+     * @return Boolean se existir arestas na lista adjascente
+     */
     @Override
     public Boolean existEdge() {
-        return adjacencyMatrix.values().stream().anyMatch(edges -> !edges.isEmpty());
+        boolean existEdge = false;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (adjacencyMatrix[i][y].equals(EXIST_EDGE)) {
+                    existEdge = true;
+                }
+            }
+        }
+        return existEdge;
     }
 
+    /**
+     * Retorna a quantidade de arestas na lista adjascente
+     *
+     * @return Quantidade de arestas na lista adjascente
+     */
     @Override
     public Integer quantityEdge() {
-        return adjacencyMatrix.values().stream().mapToInt(Map::size).sum();
+        int quantityEdge = 0;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (adjacencyMatrix[i][y].equals(EXIST_EDGE)) {
+                    quantityEdge++;
+                }
+            }
+        }
+        return quantityEdge;
     }
 
+
+    /**
+     * Retorna a quantidade de vértices na lista adjascente
+     *
+     * @return Quantidade de vértices na lista adjascente
+     */
     @Override
     public Integer quantityVertex() {
-        return adjacencyMatrix.size();
+        return adjacencyMatrix.length;
     }
 
+    /**
+     * Retorna se a lista adjascente está vazia
+     *
+     * @return Boolean se a lista adjascente está vazia
+     */
     @Override
     public Boolean isEmpty() {
-        return adjacencyMatrix.isEmpty();
+        return adjacencyMatrix.length == 0;
     }
 
+    /**
+     * Retorna se a lista adjascente é completa
+     *
+     * @return Boolean se a lista adjascente é completa
+     */
     @Override
     public Boolean isComplet() {
-        List<String> vertices = List.copyOf(adjacencyMatrix.keySet());
-        for (int i = 0; i < vertices.size(); i++) {
-            for (int j = i + 1; j < vertices.size(); j++) {
-                if (!isAdjacentVertex(vertices.get(i), vertices.get(j))) {
-                    return false;
+        boolean isComplet = true;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int y = 0; y < adjacencyMatrix.length; y++) {
+                if (i != y && adjacencyMatrix[i][y].equals(NOT_EXIST_EDGE)) {
+                    isComplet = false;
                 }
             }
         }
-        return true;
-    }
-
-
-    /**
-     * Exporta a lista adjascente para CSV em formato suportado pelo Gephi
-     *
-     * @param filePath Caminho do arquivo CSV
-     */
-    public void exportToCSV(String filePath) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
-            List<String> vertices = new ArrayList<>(adjacencyMatrix.keySet());
-            Collections.sort(vertices);
-            writer.print(";");
-            for (String vertex : vertices) {
-                writer.print(vertex + ";");
-            }
-            writer.println();
-
-            for (String vertex : vertices) {
-                writer.print(vertex + ";");
-                Map<String, String> edges = adjacencyMatrix.get(vertex);
-                for (String v : vertices) {
-                    String edgeValue = edges.getOrDefault(v, WITHOUT_WEIGHT);
-                    writer.print(edgeValue + ";");
-                }
-                writer.println();
-            }
-
-            System.out.println("Matriz adjascente exportada com sucesso.");
-        } catch (IOException e) {
-            System.err.println("Erro ao exportar matriz adjascente para CSV: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Importa a lista adjascente de um arquivo CSV em formato suportado pelo Gephi
-     *
-     * @param filePath Caminho do arquivo CSV
-     */
-    public void importFromCSV(String filePath) {
-        try (Scanner scanner = new Scanner(new File(filePath))) {
-            adjacencyMatrix.clear();
-
-            if (scanner.hasNextLine()) {
-                String headerLine = scanner.nextLine();
-                String[] vertices = headerLine.split(";");
-                int numVertices = vertices.length - 1;
-
-                for (int i = 1; i <= numVertices; i++) {
-                    adjacencyMatrix.put(vertices[i], new HashMap<>());
-                }
-
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    String[] tokens = line.split(";");
-                    String vertex = tokens[0];
-
-                    for (int i = 1; i <= numVertices; i++) {
-                        String connection = vertices[i];
-                        String weight = tokens[i];
-                        if (!weight.equals(WITHOUT_WEIGHT)) {
-                            adjacencyMatrix.get(vertex).put(connection, weight);
-                        }
-                    }
-                }
-
-                System.out.println("Matriz adjascente importada com sucesso.");
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("Erro ao importar matriz adjascente de CSV: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, Map<String, String>> entry : adjacencyMatrix.entrySet()) {
-            String vertex = entry.getKey();
-            Map<String, String> edges = entry.getValue();
-            builder.append(vertex).append(": ");
-            for (Map.Entry<String, String> edge : edges.entrySet()) {
-                String connection = edge.getKey();
-                String weight = edge.getValue();
-                builder.append("(").append(connection).append(", ").append(weight).append(") ");
-            }
-            builder.append("\n");
-        }
-        return builder.toString();
+        return isComplet;
     }
 }
