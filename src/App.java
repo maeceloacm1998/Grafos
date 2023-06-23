@@ -16,17 +16,18 @@ public class App {
         graphList.add(Graph.getGraph("C/C-D_3/C-B_5"));
         graphList.add(Graph.getGraph("D/D-E_3"));
         graphList.add(Graph.getGraph("E/"));
-        
-        AdjacencyMatrix graph =  new AdjacencyMatrix(graphList);
-        graph.exportCsv("coco2.csv");
-        graph.importCSV("coco1.csv");
+
+        AdjacencyMatrix graph = new AdjacencyMatrix(graphList);
+        AdjacencyList graph2 = new AdjacencyList(graphList);
+
+        graph.exportCsv("matriz-teste.csv");
+        graph.importCSV("matriz-teste2.csv");
+
+        graph2.exportToCSV("lista-teste.csv");
+        graph2.importFromCSV("lista-teste2.csv");
     }
 
     public static void main(String[] args) throws Exception {
-         init();
-
-//        AdjacencyList lista = new AdjacencyList(new ArrayList<GraphItem>(Collections.emptyList()));
-//        lista.importFromCSV("uepa.csv");
-//        lista.exportToCSV("teste3.csv");
+        init();
     }
 }
