@@ -67,4 +67,15 @@ public class Graph {
     private static Boolean haveConnections(String[] split) {
         return split.length != 1;
     }
+
+    public static String[] getVerticesInMatrix(String[][] adjacencyMatrix) {
+        String[] vertices = {"A", "B", "C", "D", "E", "F", "G", "H", "i", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Z"};
+        String[] aa = new String[adjacencyMatrix.length];
+
+        for(int i = 0; i < adjacencyMatrix.length; i++) {
+            aa[i] = vertices[i];
+        }
+
+        return aa;
+    }
 }

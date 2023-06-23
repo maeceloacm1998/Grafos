@@ -4,6 +4,11 @@ import models.GraphItem;
 import models.IAdjacencyMatrix;
 import utils.Graph;
 import utils.Position;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -149,13 +154,12 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
      * Usado para remover um vertice na matrix, colocando em vez de 1 para 0
      *
      * @param vertex vértices
-     * @param edge arestas
+     * @param edge   arestas
      */
     @Override
     public void remove(String vertex, String edge) {
         String connection = Graph.getConnection(edge);
-        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] =
-                NOT_EXIST_EDGE;
+        adjacencyMatrix[Position.getPosition(vertex)][Position.getPosition(connection)] = NOT_EXIST_EDGE;
     }
 
     /**
@@ -242,22 +246,21 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
      * Verifica se o vértice é adjascente ao outro vértice
      *
      * @param vertexOne vertice um para comparação
-     * @param vertexTwo  vertice dois para comparação
+     * @param vertexTwo vertice dois para comparação
      */
     @Override
     public Boolean isAdjacentVertex(String vertexOne, String vertexTwo) {
         int positionVertexOne = Position.getPosition(vertexOne);
         int positionVertexTwo = Position.getPosition(vertexTwo);
 
-        return adjacencyMatrix[positionVertexOne][positionVertexTwo].equals(EXIST_EDGE)
-                || adjacencyMatrix[positionVertexTwo][positionVertexOne].equals(EXIST_EDGE);
+        return adjacencyMatrix[positionVertexOne][positionVertexTwo].equals(EXIST_EDGE) || adjacencyMatrix[positionVertexTwo][positionVertexOne].equals(EXIST_EDGE);
     }
 
     /**
      * Verifica se o vértice é adjascente ao outro vértice
      *
      * @param connectionOne aresta um para comparação
-     * @param connectionTwo  aresta dois para comparação
+     * @param connectionTwo aresta dois para comparação
      */
     @Override
     public Boolean isAdjacentEdge(String connectionOne, String connectionTwo) {
@@ -265,8 +268,7 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
         String[] splitConnectionTwo = connectionTwo.split("-");
 
         if (validateAdjacentEdges(splitConnectionOne, splitConnectionTwo)) {
-            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE)
-                    && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
+            return adjacencyMatrix[Position.getPosition(splitConnectionOne[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE) && adjacencyMatrix[Position.getPosition(splitConnectionTwo[0])][Position.getPosition(splitConnectionOne[1])].equals(EXIST_EDGE);
         }
         return false;
     }
@@ -277,7 +279,7 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
      * não tem o que comparar.
      *
      * @param splitConnectionOne aresta um para comparação
-     * @param splitConnectionTwo  aresta dois para comparação
+     * @param splitConnectionTwo aresta dois para comparação
      */
     private Boolean validateAdjacentEdges(String[] splitConnectionOne, String[] splitConnectionTwo) {
         Boolean firstValidation = isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[0]) || isEqualsVertex(splitConnectionOne[0], splitConnectionTwo[1]);
@@ -362,5 +364,66 @@ public class AdjacencyMatrix implements IAdjacencyMatrix {
             }
         }
         return isComplet;
+    }
+
+
+    public void exportCsv(String fileName) {
+        String[] vertices = Graph.getVerticesInMatrix(adjacencyMatrix);
+
+        try {
+            FileWriter writer = new FileWriter(fileName);
+
+            // Escreve o cabeçalho do CSV
+            writer.append(";");
+            for (String vertex : vertices) {
+                writer.append(vertex).append(";");
+            }
+            writer.append("\n");
+
+            // Escreve a matriz de adjacência
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                writer.append(vertices[i]).append(";");
+                for (int j = 0; j < adjacencyMatrix[i].length; j++) {
+                    writer.append(Integer.toString(Integer.parseInt(adjacencyMatrix[i][j]))).append(";");
+                }
+                writer.append("\n");
+            }
+
+            writer.flush();
+            writer.close();
+
+            System.out.println("A matriz de adjacência foi salva no arquivo " + fileName);
+        } catch (IOException e) {
+            System.out.println("Erro ao escrever o arquivo CSV: " + e.getMessage());
+        }
+    }
+
+
+    public void importCSV(String csvFileName) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(csvFileName));
+
+            // Lê a primeira linha para obter os vértices
+            String[] vertices = reader.readLine().split(";");
+
+            int numVertices = vertices.length - 1;
+            int[][] adjacencyMatrix = new int[numVertices][numVertices];
+
+            String line;
+            int rowIndex = 0;
+
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(";");
+                for (int columnIndex = 1; columnIndex < values.length; columnIndex++) {
+                    adjacencyMatrix[rowIndex][columnIndex - 1] = Integer.parseInt(values[columnIndex]);
+                }
+                rowIndex++;
+            }
+
+            reader.close();
+
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo CSV: " + e.getMessage());
+        }
     }
 }

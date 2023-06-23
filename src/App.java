@@ -18,23 +18,15 @@ public class App {
         graphList.add(Graph.getGraph("E/"));
         
         AdjacencyMatrix graph =  new AdjacencyMatrix(graphList);
-        AdjacencyList lista = new AdjacencyList(graphList);
-        
-        
-        Boolean adjacentEdge = lista.isAdjacentEdge("A-B", "A-C");
-        // boolean adjacentVertex = lista.isAdjacentVertex("A", "C");
-        System.out.println(adjacentEdge);
-        Boolean x = graph.isVertexLabeled("A");
-        Boolean y = lista.isVertexLabeled("A");
-        // System.out.println(y);
-        String a = "";
+        graph.exportCsv("coco2.csv");
+        graph.importCSV("coco1.csv");
     }
 
     public static void main(String[] args) throws Exception {
-        // init();
+         init();
 
-        AdjacencyList lista = new AdjacencyList(new ArrayList<GraphItem>(Collections.emptyList()));
-        lista.importFromCSV("uepa.csv");
-        lista.exportToCSV("teste3.csv");
+//        AdjacencyList lista = new AdjacencyList(new ArrayList<GraphItem>(Collections.emptyList()));
+//        lista.importFromCSV("uepa.csv");
+//        lista.exportToCSV("teste3.csv");
     }
 }
